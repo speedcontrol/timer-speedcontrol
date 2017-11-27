@@ -1,3 +1,5 @@
 # Node / Bower
 bower_components/
 node_modules/
+
+persist.json

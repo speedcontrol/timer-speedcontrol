@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fs-extra": "^4.0.2",
     "node-ipc": "^9.1.1",
     "rieussec": "^0.3.0"
   }

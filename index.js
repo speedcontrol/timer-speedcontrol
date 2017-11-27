@@ -1,6 +1,8 @@
 // Code based off of stuff used for the SGDQ15 layouts.
 // https://github.com/GamesDoneQuick/sgdq15-layouts/blob/master/extension/stopwatches.js
 
+var fs = require('fs-extra');
+
 // Set up server.
 var ipc = require('node-ipc');
 ipc.config.id = 'timer-speedcontrol';
@@ -14,8 +16,17 @@ ipc.server.start();
 var defaultStopwatch = {time: '00:00:00', state: 'stopped', milliseconds: 0};
 var stopwatch = {value: defaultStopwatch};
 
+var stopwatchPersist = fs.readJsonSync('./persist.json', {throws:false});
+if (stopwatchPersist) {
+	console.log('Loaded previous stopwatch data from persist file.');
+	stopwatch.value = stopwatchPersist;
+}
+
 // If the timer was running when last closed, changes it to being paused.
-if (stopwatch.value.state === 'running') stopwatch.value.state = 'paused';
+if (stopwatch.value.state === 'running') {
+	stopwatch.value.state = 'paused';
+	fs.writeJson('./persist.json', stopwatch.value);
+}
 
 // Load the existing time and start the stopwatch at that if needed/possible.
 var startMS = stopwatch.value.milliseconds || 0;
@@ -31,6 +42,7 @@ rieussec.on('tick', ms => {
 	stopwatch.value.time = msToTime(ms);
 	stopwatch.value.milliseconds = ms;
 	ipc.server.broadcast('tick', JSON.stringify(stopwatch.value));
+	fs.writeJson('./persist.json', stopwatch.value);
 });
 
 // Update the state of the timer whenever it changes and broadcast the change.
@@ -38,6 +50,7 @@ rieussec.on('state', state => {
 	stopwatch.value.state = state;
 	ipc.server.broadcast('state', stopwatch.value.state);
 	console.log('State changed: '+state);
+	fs.writeJson('./persist.json', stopwatch.value);
 });
 
 // If the client requests the stopwatch object, broadcasts this.
@@ -67,6 +80,7 @@ ipc.server.on('finishTime', () => {
 	stopwatch.value.state = 'finished';
 	ipc.server.broadcast('state', stopwatch.value.state);
 	console.log('State changed: '+stopwatch.value.state);
+	fs.writeJson('./persist.json', stopwatch.value);
 });
 
 // If the client wants to reset the timer...
