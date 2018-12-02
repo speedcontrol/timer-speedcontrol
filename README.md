@@ -1,3 +1,5 @@
+## This bundle is outdated and unneeded; nodecg-speedcontrol now has a way to recover lost time built in if the server has to restart. It is being left here as reference!
+
 # timer-speedcontrol
 
 An external timer script to be used with [nodecg-speedcontrol](https://github.com/speedcontrol/nodecg-speedcontrol), which you may use in case you are worried about the NodeCG server crashing, which can be resumed once it has restarted, but with the current implementation results in the timer becoming paused.
